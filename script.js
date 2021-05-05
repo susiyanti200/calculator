@@ -89,6 +89,13 @@ const doOperation = (e) => {
         displayNumber(acc);
         clear();
       }
+      break;
+    case "+/-":
+      displayNumber(-1 * parseFloat(display.textContent));
+      break;
+    case "%":
+      displayNumber((parseFloat(display.textContent) / 100) * acc);
+      break;
   }
 };
 
