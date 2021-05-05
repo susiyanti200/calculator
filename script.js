@@ -1,6 +1,20 @@
 const display = document.querySelector(".display");
 const numbers = document.querySelectorAll(".number");
 const operations = document.querySelectorAll(".operation");
+const opList = [
+  "+",
+  "-",
+  "*",
+  "/",
+  "=",
+  "%",
+  "+/-",
+  "C",
+  "←",
+  "Enter",
+  "Backspace",
+  "Delete",
+];
 
 let acc = 0;
 let isNewNumber = false;
@@ -19,18 +33,18 @@ const displayNumber = (num) => {
   }
 };
 
-const setNumber = (e) => {
+const setNumber = (numText) => {
   if (!isNewNumber && display.textContent.length > 15) return;
-  if (e.target.textContent === ".") {
+  if (numText === ".") {
     if (!isNewNumber && display.textContent.includes(".")) return;
     display.textContent = isNewNumber
-      ? "0" + e.target.textContent
-      : display.textContent + e.target.textContent;
+      ? "0" + numText
+      : display.textContent + numText;
   } else {
     display.textContent =
       display.textContent === "0" || isNewNumber
-        ? e.target.textContent
-        : display.textContent + e.target.textContent;
+        ? numText
+        : display.textContent + numText;
   }
   isNewNumber = false;
 };
@@ -55,14 +69,16 @@ const clear = () => {
   op = null;
 };
 
-const doOperation = (e) => {
-  switch (e.target.textContent) {
+const doOperation = (opChoose) => {
+  switch (opChoose) {
     case "C":
+    case "Delete":
       displayNumber(0);
       clear();
       acc = 0;
       break;
-    case "DEL":
+    case "←":
+    case "Backspace":
       display.textContent.length > 1
         ? displayNumber(
             display.textContent.slice(0, display.textContent.length - 1)
@@ -80,9 +96,10 @@ const doOperation = (e) => {
         displayNumber(acc);
         isNewNumber = true;
       }
-      op = e.target.textContent;
+      op = opChoose;
       break;
     case "=":
+    case "Enter":
       // calculate operation if number is pressed after operator
       if (!isNewNumber) {
         acc = evaluate(acc, parseFloat(display.textContent));
@@ -99,10 +116,29 @@ const doOperation = (e) => {
   }
 };
 
+const handleKeyboard = (e) => {
+  if (e.key === "." || (e.key >= "0" && e.key <= "9")) {
+    setNumber(e.key);
+  }
+  if (opList.includes(e.key)) {
+    doOperation(e.key);
+  }
+};
+
+const handleNumberButton = (e) => {
+  setNumber(e.target.textContent);
+};
+
+const handleOperationButton = (e) => {
+  doOperation(e.target.textContent);
+};
+
 numbers.forEach((number) => {
-  number.addEventListener("click", setNumber);
+  number.addEventListener("click", handleNumberButton);
 });
 
 operations.forEach((op) => {
-  op.addEventListener("click", doOperation);
+  op.addEventListener("click", handleOperationButton);
 });
+
+document.addEventListener("keydown", handleKeyboard);
